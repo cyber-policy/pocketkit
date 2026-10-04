@@ -212,7 +212,7 @@ async function myip(){const o=$('myip');o.textContent='Your public IP: checking.
 $('imy').onclick=myip;myip();
 
 /* Accounts + Pro plan (Supabase). Edit CFG, see SETUP.md */
-const CFG={url:'YOUR_SUPABASE_URL',key:'YOUR_SUPABASE_ANON_KEY',monthly:'https://YOURSTORE.lemonsqueezy.com/checkout/buy/MONTHLY_ID',yearly:'https://YOURSTORE.lemonsqueezy.com/checkout/buy/YEARLY_ID'};
+const CFG={url:'https://edljwydvgmukggrnbflw.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkbGp3eWR2Z211a2dncm5iZmx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwODEzMjgsImV4cCI6MjEwNjY1NzMyOH0.JkEKcGslmq7SJgTI22ZgQCiZrkESpoQNTrrbtFNLukU',monthly:'https://YOURSTORE.lemonsqueezy.com/checkout/buy/MONTHLY_ID',yearly:'https://YOURSTORE.lemonsqueezy.com/checkout/buy/YEARLY_ID'};
 let sb=null,plan='free',sess=null;
 try{if(window.supabase&&!CFG.url.startsWith('YOUR_'))sb=supabase.createClient(CFG.url,CFG.key)}catch(e){}
 const PRO='Domain / IP vulnerability report\nSEO keyword checker\nWeb scraper\nBug finder';
