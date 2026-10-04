@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PocketSec – Free Security & Developer Tools</title>
+<meta name="description" content="Free password generator, hash generator, JWT decoder, JSON formatter, IP/DNS lookup and phishing link checker. Runs in your browser.">
+<style>
+:root{--bg:#f5f7f4;--card:#fff;--ink:#14201b;--mut:#5b6b64;--line:#d9e1dc;--acc:#0f9d6b;--acc2:#e8f6ef;--bad:#d64545;--warn:#d98a00;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1512;--card:#16201b;--ink:#e6efe9;--mut:#93a69c;--line:#26352d;--acc:#2fd391;--acc2:#12281f}}
+:root[data-theme="dark"]{--bg:#0e1512;--card:#16201b;--ink:#e6efe9;--mut:#93a69c;--line:#26352d;--acc:#2fd391;--acc2:#12281f}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Trebuchet MS",system-ui,sans-serif}
+.w{max-width:760px;margin:0 auto;padding:18px 14px 40px}
+h1{font:800 30px/1.1 "Trebuchet MS",sans-serif;margin:6px 0 4px;letter-spacing:-.5px}
+h1 b{color:var(--acc)}
+.sub{color:var(--mut);margin:0 0 16px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px}
+.tabs button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 13px;border-radius:999px;font:600 14px inherit;cursor:pointer}
+.tabs button.on{background:var(--acc);color:#04170f;border-color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.p{display:none}.p.on{display:block}
+label{display:block;font-weight:600;margin:12px 0 5px;font-size:14px}
+input[type=text],input[type=password],textarea,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:15px ui-monospace,Menlo,monospace}
+textarea{min-height:130px;resize:vertical}
+.btn{background:var(--acc);color:#04170f;border:0;padding:11px 16px;border-radius:10px;font:700 15px inherit;cursor:pointer;margin:10px 8px 0 0}
+.btn.s{background:var(--acc2);color:var(--acc);border:1px solid var(--line)}
+.out{margin-top:12px;padding:12px;border-radius:10px;background:var(--acc2);font:14px ui-monospace,Menlo,monospace;word-break:break-all;white-space:pre-wrap;overflow-x:auto}
+.row{display:flex;flex-wrap:wrap;gap:14px}.row label{display:flex;gap:6px;align-items:center;margin:8px 0;font-weight:500}
+.bar{height:9px;border-radius:9px;background:var(--line);margin-top:10px;overflow:hidden}.bar i{display:block;height:100%;width:0;transition:width .25s,background .25s}
+.sm{color:var(--mut);font-size:13px}
+.bad{color:var(--bad)}.ok{color:var(--acc)}.warn{color:var(--warn)}
+.ad{margin:18px 0;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:10px;color:var(--mut);font-size:13px}
+footer{margin-top:20px;color:var(--mut);font-size:13px;text-align:center}
+</style></head><body><div class="w">
+<h1>Pocket<b>Sec</b></h1>
+<p class="sub">Free security and developer tools. Everything runs in your browser, nothing is uploaded.</p>
+<div class="tabs" id="tabs"></div>
+<div class="card">
+
+<div class="p" id="t-pass" data-n="Password">
+<label>Generated password</label><input type="text" id="pg" readonly>
+<label>Length: <span id="pl">16</span></label><input type="range" id="plen" min="8" max="64" value="16" style="width:100%">
+<div class="row"><label><input type="checkbox" id="pu" checked>A-Z</label><label><input type="checkbox" id="pw" checked>a-z</label><label><input type="checkbox" id="pn" checked>0-9</label><label><input type="checkbox" id="ps" checked>!@#$</label></div>
+<button class="btn" id="pgen">Generate</button><button class="btn s" id="pcopy">Copy</button><button class="btn s" id="psv">Save to vault</button>
+<label>Check your own password strength</label><input type="password" id="pc" placeholder="Type a password (stays on your device)">
+<div class="bar"><i id="pb"></i></div><div class="out" id="po">Type a password to test it.</div></div>
+
+<div class="p" id="t-hash" data-n="Hash">
+<label>Text to hash</label><textarea id="hi" placeholder="Type or paste text"></textarea>
+<label>Or hash a file</label><input type="file" id="hf"><div class="out" id="ho">Hashes appear here.</div><p class="sm">SHA-1, SHA-256, SHA-384 and SHA-512 are supported.</p></div>
+
+<div class="p" id="t-jwt" data-n="JWT">
+<label>Paste a JWT</label><textarea id="ji" placeholder="eyJhbGciOi..."></textarea>
+<button class="btn" id="jgo">Decode</button><div class="out" id="jo">Header and payload appear here.</div>
+<p class="sm">Decoding does not verify the signature.</p></div>
+
+<div class="p" id="t-json" data-n="JSON">
+<label>JSON</label><textarea id="si" placeholder='{"name":"dinkydo"}'></textarea>
+<button class="btn" id="sf">Format</button><button class="btn s" id="sm">Minify</button><button class="btn s" id="sc">Copy</button>
+<div class="out" id="so">Result appears here.</div></div>
+
+<div class="p" id="t-ip" data-n="IP / DNS"><div class="out" id="myip">Your public IP: checking...</div>
+<label>IP address or domain</label><input type="text" id="ii" placeholder="8.8.8.8 or example.com">
+<button class="btn" id="igo">Analyze</button><button class="btn s" id="idns">DNS records</button><button class="btn s" id="imy">My IP</button>
+<div class="out" id="io">Enter an IP to see its type and formats, or a domain for DNS records.</div></div>
+
+<div class="p" id="t-link" data-n="Link checker">
+<label>Link to check</label><input type="text" id="li" placeholder="https://paypal-login.verify-account.xyz/signin">
+<button class="btn" id="lgo">Check link</button><div class="bar"><i id="lb"></i></div>
+<div class="out" id="lo">Paste a link to scan it for phishing signs.</div>
+<p class="sm">This is a safety check from the link's text only. It cannot guarantee a link is safe.</p></div>
+
+<div class="p" id="t-enc" data-n="Encode">
+<label>Text</label><textarea id="ei" placeholder="Text or encoded string"></textarea>
+<button class="btn" data-e="b64e">Base64 encode</button><button class="btn s" data-e="b64d">Base64 decode</button><button class="btn s" data-e="ue">URL encode</button><button class="btn s" data-e="ud">URL decode</button><button class="btn s" data-e="hx">To hex</button>
+<div class="out" id="eo">Result appears here.</div></div>
+
+<div class="p" id="t-tok" data-n="Tokens">
+<label>Type</label><select id="tk"><option value="uuid">UUID v4</option><option value="h16">Random hex (16 bytes)</option><option value="h32">Random hex (32 bytes)</option><option value="b64">API key (base64url, 32 bytes)</option></select>
+<button class="btn" id="tg">Generate</button><button class="btn s" id="tc">Copy</button><button class="btn s" id="ts">Save to vault</button>
+<div class="out" id="to">Click Generate.</div></div>
+
+<div class="p" id="t-vault" data-n="Vault 🔒">
+<div id="vlock">
+<p class="sm">Your vault is encrypted on this device with your master password (AES-256-GCM). Nobody else can read it, and there is no password recovery. Keep a backup.</p>
+<label>Email</label><input type="text" id="ve" autocomplete="username" inputmode="email">
+<label>Master password</label><input type="password" id="vp" autocomplete="current-password">
+<button class="btn" id="vlogin">Log in</button><button class="btn s" id="vnew">Create account</button>
+<div class="out" id="vmsg">Create an account or log in.</div>
+<label>Restore a backup (paste it here, enter your email above, then log in)</label><textarea id="vbk2" style="min-height:70px"></textarea>
+<button class="btn s" id="vrestore">Restore backup</button></div>
+<div id="vmain" style="display:none">
+<div class="sm" id="vwho"></div>
+<label>Add item</label><select id="vt"><option>Password</option><option>Resource</option><option>Note</option></select>
+<input type="text" id="vti" placeholder="Title (e.g. GitHub)" style="margin-top:8px"><textarea id="vva" placeholder="Value, link or note" style="min-height:70px;margin-top:8px"></textarea>
+<button class="btn" id="vadd">Save item</button><button class="btn s" id="vlk">Lock</button><button class="btn s" id="vbk">Copy encrypted backup</button>
+<div id="vl"></div></div></div>
+
+<div class="p" id="t-acct" data-n="Account">
+<div class="out" id="amsg">Not signed in.</div>
+<div id="aform">
+<label>Email</label><input type="text" id="ae" inputmode="email" autocomplete="username">
+<label>Password</label><input type="password" id="ap" autocomplete="current-password">
+<button class="btn" id="ain">Log in</button><button class="btn s" id="aup">Sign up</button><button class="btn s" id="arst">Forgot password</button></div>
+<div id="aon" style="display:none"><button class="btn s" id="arf">Refresh plan</button><button class="btn s" id="aout">Log out</button></div>
+<label>PocketSec Pro</label>
+<p class="sm">No ads, every tool, plus Pro tools. $2/month or $18/year.</p>
+<button class="btn" id="bm">Pro monthly $2</button><button class="btn" id="by">Pro yearly $18</button></div>
+
+<div class="p" id="t-pro" data-n="Pro tools">
+<div class="out" id="pmsg"></div></div>
+
+</div>
+<div class="ad">Ad space (AdSense goes here)</div>
+<footer>© PocketSec · Privacy · Terms · Contact</footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const tabs=$('tabs');document.querySelectorAll('.p').forEach((p,i)=>{const b=document.createElement('button');b.textContent=p.dataset.n;b.dataset.t=p.id;b.onclick=()=>show(p.id,b);tabs.appendChild(b);if(!i)show(p.id,b)});
+function show(id,b){document.querySelectorAll('.p').forEach(x=>x.classList.toggle('on',x.id===id));[...tabs.children].forEach(x=>x.classList.toggle('on',x===b))}
+const cp=t=>{try{navigator.clipboard.writeText(t)}catch(e){}};
+/* Password */
+const SETS={pu:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',pw:'abcdefghijklmnopqrstuvwxyz',pn:'0123456789',ps:'!@#$%^&*()-_=+[]{};:,.?'};
+function rnd(n){const a=new Uint32Array(1),lim=Math.floor(4294967296/n)*n;let v;do{crypto.getRandomValues(a);v=a[0]}while(v>=lim);return v%n}
+function gen(){let pool='',req=[];for(const k in SETS)if($(k).checked){pool+=SETS[k];req.push(SETS[k])}
+if(!pool){$('pg').value='Select at least one type';return}
+const L=+$('plen').value;let out=req.map(s=>s[rnd(s.length)]);while(out.length<L)out.push(pool[rnd(pool.length)]);
+for(let i=out.length-1;i>0;i--){const j=rnd(i+1);[out[i],out[j]]=[out[j],out[i]]}$('pg').value=out.slice(0,L).join('')}
+$('plen').oninput=e=>{$('pl').textContent=e.target.value;gen()};['pu','pw','pn','ps'].forEach(k=>$(k).onchange=gen);$('pgen').onclick=gen;$('pcopy').onclick=()=>cp($('pg').value);gen();
+$('pc').oninput=e=>{const p=e.target.value;if(!p){$('pb').style.width=0;$('po').textContent='Type a password to test it.';return}
+let pool=0;if(/[a-z]/.test(p))pool+=26;if(/[A-Z]/.test(p))pool+=26;if(/\d/.test(p))pool+=10;if(/[^A-Za-z0-9]/.test(p))pool+=32;
+let bits=p.length*Math.log2(pool);const common=/^(password|123456|qwerty|admin|letmein|welcome|iloveyou)/i.test(p);if(common||/(.)\1{3,}/.test(p)||/(0123|1234|abcd|qwer)/i.test(p))bits=Math.min(bits,28);
+const s=Math.pow(2,bits)/2/1e10;const t=s<1?'instantly':s<60?Math.round(s)+' seconds':s<3600?Math.round(s/60)+' minutes':s<86400?Math.round(s/3600)+' hours':s<3.15e7?Math.round(s/86400)+' days':s<3.15e9?Math.round(s/3.15e7)+' years':'centuries';
+const lv=bits<40?['Weak','var(--bad)',20]:bits<60?['Fair','var(--warn)',50]:bits<80?['Strong','var(--acc)',78]:['Very strong','var(--acc)',100];
+$('pb').style.width=lv[2]+'%';$('pb').style.background=lv[1];
+$('po').textContent=lv[0]+'\nEntropy: '+Math.round(bits)+' bits\nEstimated offline crack time: '+t+(common?'\nThis looks like a common pattern. Avoid it.':'')};
+/* Hash */
+$('hi').oninput=async e=>{const d=new TextEncoder().encode(e.target.value);let o='';for(const a of ['SHA-1','SHA-256','SHA-384','SHA-512']){const h=await crypto.subtle.digest(a,d);o+=a+'\n'+[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')+'\n\n'}$('ho').textContent=o.trim()};
+/* JWT */
+const b64=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return decodeURIComponent(escape(atob(s)))};
+$('jgo').onclick=()=>{const t=$('ji').value.trim().split('.');try{if(t.length<2)throw 0;const h=JSON.parse(b64(t[0])),p=JSON.parse(b64(t[1]));let x='HEADER\n'+JSON.stringify(h,null,2)+'\n\nPAYLOAD\n'+JSON.stringify(p,null,2);
+if(p.exp){const d=new Date(p.exp*1000);x+='\n\nExpires: '+d.toUTCString()+(d<new Date()?' (EXPIRED)':' (valid)')}if(h.alg==='none')x+='\n\nWarning: alg is "none", token is unsigned.';$('jo').textContent=x}catch(e){$('jo').textContent='Not a valid JWT. It needs 3 parts separated by dots.'}};
+/* JSON */
+function js(m){try{const v=JSON.parse($('si').value);$('so').textContent=m?JSON.stringify(v):JSON.stringify(v,null,2);$('so').className='out'}catch(e){$('so').textContent='Invalid JSON: '+e.message;$('so').className='out bad'}}
+$('sf').onclick=()=>js(0);$('sm').onclick=()=>js(1);$('sc').onclick=()=>cp($('so').textContent);
+/* IP / DNS */
+const v4=s=>/^(\d{1,3})(\.\d{1,3}){3}$/.test(s)&&s.split('.').every(n=>+n<256);
+$('igo').onclick=()=>{const s=$('ii').value.trim(),o=$('io');if(v4(s)){const n=s.split('.').map(Number),d=((n[0]*256+n[1])*256+n[2])*256+n[3];
+let type='Public';if(n[0]===10||(n[0]===172&&n[1]>=16&&n[1]<32)||(n[0]===192&&n[1]===168))type='Private (LAN)';else if(n[0]===127)type='Loopback';else if(n[0]===169&&n[1]===254)type='Link-local';else if(n[0]>=224)type='Multicast/Reserved';else if(n[0]===100&&n[1]>=64&&n[1]<128)type='Carrier-grade NAT';
+o.textContent='IPv4: '+s+'\nType: '+type+'\nDecimal: '+d+'\nHex: 0x'+d.toString(16).toUpperCase()+'\nBinary: '+n.map(x=>x.toString(2).padStart(8,'0')).join('.')+'\nReverse DNS name: '+n.reverse().join('.')+'.in-addr.arpa'}
+else if(/^[0-9a-f:]+$/i.test(s)&&s.includes(':'))o.textContent='IPv6 address: '+s+'\nLoopback: '+(s==='::1')+'\nLink-local: '+/^fe80/i.test(s)+'\nUnique local: '+/^f[cd]/i.test(s);
+else o.textContent='Not an IP address. Use the DNS records button for domains.'};
+$('idns').onclick=async()=>{const d=$('ii').value.trim().replace(/^https?:\/\//,'').split('/')[0],o=$('io');if(!d){o.textContent='Enter a domain first.';return}o.textContent='Looking up...';let x='';
+try{for(const t of ['A','AAAA','MX','NS','TXT']){const r=await fetch('https://cloudflare-dns.com/dns-query?name='+encodeURIComponent(d)+'&type='+t,{headers:{accept:'application/dns-json'}});const j=await r.json();x+=t+'\n'+((j.Answer||[]).map(a=>a.data).join('\n')||'none')+'\n\n'}o.textContent=x.trim()}
+catch(e){o.textContent='Live DNS lookup is blocked in this preview. It works when you host the page on your own domain (Vercel, Netlify, Cloudflare Pages).'}};
+/* Link checker */
+$('lgo').onclick=()=>{let u=$('li').value.trim(),f=[],sc=0;if(!u)return;const add=(w,m)=>{sc+=w;f.push(m)};let url;try{url=new URL(/^[a-z]+:\/\//i.test(u)?u:'http://'+u)}catch(e){$('lo').textContent='That is not a valid link.';return}
+const h=url.hostname.toLowerCase(),parts=h.split('.'),dom=parts.slice(-2).join('.');
+if(url.protocol!=='https:')add(15,'Not using HTTPS');if(v4(h))add(30,'Uses a raw IP address instead of a domain');if(u.includes('@'))add(25,'Contains "@", which can hide the real destination');
+if(h.includes('xn--'))add(25,'Punycode domain, may imitate another site with look-alike letters');if(parts.length>4)add(15,'Many subdomains ('+parts.length+' parts)');if(u.length>100)add(10,'Very long link');
+if(/\.(zip|xyz|top|tk|ml|ga|cf|gq|click|work|loan|country|support)$/.test(h))add(20,'Uses a TLD often abused for scams');
+if(/^(bit\.ly|tinyurl\.com|t\.co|goo\.gl|is\.gd|ow\.ly|cutt\.ly|rb\.gy)$/.test(h))add(15,'URL shortener hides the real destination');
+const brands=['paypal','google','microsoft','apple','amazon','facebook','instagram','netflix','binance','bank','dhl','whatsapp'];for(const b of brands)if(h.includes(b)&&!dom.startsWith(b+'.')){add(30,'Mentions "'+b+'" but the real domain is '+dom);break}
+const kw=(url.pathname+url.search+h).match(/login|signin|verify|update|secure|account|wallet|password|confirm|suspend|unlock|bonus|gift/gi);if(kw)add(Math.min(20,kw.length*7),'Pressure keywords: '+[...new Set(kw.map(k=>k.toLowerCase()))].join(', '));
+if((h.match(/-/g)||[]).length>=3)add(10,'Many hyphens in the domain');
+sc=Math.min(100,sc);const v=sc>=60?['High risk','var(--bad)','bad']:sc>=30?['Suspicious','var(--warn)','warn']:['Low risk','var(--acc)','ok'];
+$('lb').style.width=Math.max(sc,6)+'%';$('lb').style.background=v[1];$('lo').className='out '+v[2];$('lo').textContent=v[0]+' (score '+sc+'/100)\nDomain: '+dom+(f.length?'\n\n- '+f.join('\n- '):'\n\nNo common phishing signs found.')};
+
+/* Vault */
+const enc=new TextEncoder(),dec=new TextDecoder();
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const b2s=b=>btoa(Array.from(new Uint8Array(b),c=>String.fromCharCode(c)).join('')),s2b=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let V=null,pending=null,mem={},lockT;
+const st={get:k=>{try{return localStorage.getItem(k)}catch(e){return mem[k]||null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){mem[k]=v}}};
+const vkey=async e=>'ps_v_'+hex(await crypto.subtle.digest('SHA-256',enc.encode(e.trim().toLowerCase())));
+async function derive(pw,salt,iter){const m=await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function seal(){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},V.key,enc.encode(JSON.stringify(V.items)));st.set(V.k,JSON.stringify({v:1,iter:V.iter,salt:b2s(V.salt),iv:b2s(iv),ct:b2s(ct)}))}
+function goTab(id){[...tabs.children].forEach(b=>{if(b.dataset.t===id)b.click()})}
+function arm(){clearTimeout(lockT);lockT=setTimeout(lock,300000)}
+function lock(){V=null;clearTimeout(lockT);$('vmain').style.display='none';$('vlock').style.display='block';$('vmsg').textContent='Vault locked.'}
+document.addEventListener('click',()=>{if(V)arm()});
+async function opened(){$('vp').value='';$('vlock').style.display='none';$('vmain').style.display='block';$('vwho').textContent='Signed in as '+V.email+'. Auto-locks after 5 minutes.';if(pending){V.items.unshift(pending);pending=null;await seal()}render();arm()}
+function render(){const l=$('vl');l.textContent='';if(!V.items.length){const p=document.createElement('p');p.className='sm';p.textContent='Nothing saved yet.';l.appendChild(p);return}
+V.items.forEach((it,i)=>{const d=document.createElement('div');d.className='out';const h=document.createElement('b');h.textContent=it.t+' ('+it.k+')';const v=document.createElement('div');let shown=it.k!=='Password';v.textContent=shown?it.v:'••••••••••';
+const mk=(n,f)=>{const b=document.createElement('button');b.className='btn s';b.textContent=n;b.onclick=f;return b};
+const bs=[mk('Copy',()=>cp(it.v)),mk('Delete',async()=>{V.items.splice(i,1);await seal();render()})];if(it.k==='Password')bs.unshift(mk('Show',()=>{shown=!shown;v.textContent=shown?it.v:'••••••••••'}));
+d.append(h,v,...bs);l.appendChild(d)})}
+function toVault(k,t,v){const it={k,t,v,d:Date.now()};if(V){V.items.unshift(it);seal().then(render)}else{pending=it;$('vmsg').textContent='Log in or create an account to save this item.'}goTab('t-vault')}
+$('vnew').onclick=async()=>{const e=$('ve').value.trim(),p=$('vp').value,m=$('vmsg');
+if(!/^\S+@\S+\.\S+$/.test(e)){m.textContent='Enter a valid email.';return}
+if(p.length<10||!/[a-z]/i.test(p)||!/\d/.test(p)){m.textContent='Master password needs 10+ characters with letters and numbers. A passphrase works well.';return}
+const k=await vkey(e);if(st.get(k)){m.textContent='An account for this email already exists on this device. Log in instead.';return}
+m.textContent='Creating encrypted vault...';const salt=crypto.getRandomValues(new Uint8Array(16)),iter=600000;
+V={k,salt,iter,items:[],key:await derive(p,salt,iter),email:e};await seal();opened()};
+$('vlogin').onclick=async()=>{const e=$('ve').value.trim(),p=$('vp').value,m=$('vmsg');if(!e||!p){m.textContent='Enter your email and master password.';return}
+const k=await vkey(e),raw=st.get(k);if(!raw){m.textContent='No account for this email on this device. Create one or restore a backup.';return}
+m.textContent='Unlocking...';try{const r=JSON.parse(raw),salt=s2b(r.salt),key=await derive(p,salt,r.iter);const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:s2b(r.iv)},key,s2b(r.ct));V={k,salt,iter:r.iter,key,email:e,items:JSON.parse(dec.decode(pt))};opened()}catch(x){m.textContent='Wrong email or master password.'}};
+$('vadd').onclick=async()=>{if(!V)return;const t=$('vti').value.trim(),v=$('vva').value;if(!t||!v)return;V.items.unshift({k:$('vt').value,t,v,d:Date.now()});await seal();$('vti').value='';$('vva').value='';render()};
+$('vlk').onclick=lock;
+$('vbk').onclick=()=>{cp(st.get(V.k)||'');$('vwho').textContent='Encrypted backup copied. Save it somewhere safe.'};
+$('vrestore').onclick=async()=>{const m=$('vmsg'),e=$('ve').value.trim();try{const r=JSON.parse($('vbk2').value);if(!e||!r.salt||!r.iv||!r.ct||!(r.iter>=1e5&&r.iter<=2e6))throw 0;const k=await vkey(e);if(st.get(k)){m.textContent='An account already exists for this email here.';return}st.set(k,JSON.stringify({v:1,iter:r.iter,salt:r.salt,iv:r.iv,ct:r.ct}));m.textContent='Backup restored. Now log in.'}catch(x){m.textContent='Enter your email and paste a valid backup.'}};
+$('psv').onclick=()=>toVault('Password','Generated '+new Date().toLocaleDateString(),$('pg').value);
+/* Tokens */
+$('tg').onclick=()=>{const t=$('tk').value;let o;if(t==='uuid')o=crypto.randomUUID();else{const n=t==='h16'?16:32,a=crypto.getRandomValues(new Uint8Array(n));o=t==='b64'?btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''):hex(a)}$('to').textContent=o};
+$('tc').onclick=()=>cp($('to').textContent);
+$('ts').onclick=()=>{const v=$('to').textContent;if(v.length>20)toVault('Password','Token '+new Date().toLocaleDateString(),v)};
+/* Encode */
+document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{const s=$('ei').value,m=b.dataset.e,o=$('eo');try{o.textContent=m==='b64e'?btoa(unescape(encodeURIComponent(s))):m==='b64d'?decodeURIComponent(escape(atob(s.trim()))):m==='ue'?encodeURIComponent(s):m==='ud'?decodeURIComponent(s):[...enc.encode(s)].map(x=>x.toString(16).padStart(2,'0')).join(' ')}catch(x){o.textContent='Could not convert. Check the input.'}});
+/* File hash + My IP */
+$('hf').onchange=async e=>{const f=e.target.files[0];if(!f)return;const d=await f.arrayBuffer();let o=f.name+'\n\n';for(const a of ['SHA-1','SHA-256','SHA-512'])o+=a+'\n'+hex(await crypto.subtle.digest(a,d))+'\n\n';$('ho').textContent=o.trim()};
+async function myip(){const o=$('myip');o.textContent='Your public IP: checking...';try{const r=await fetch('https://api.ipify.org?format=json'),j=await r.json();o.textContent='Your public IP: '+j.ip}catch(e){o.textContent='Your public IP: unavailable in this preview. It shows automatically when hosted on your own domain.'}}
+$('imy').onclick=myip;myip();
+
+/* Accounts + Pro plan (Supabase). Edit CFG, see SETUP.md */
+const CFG={url:'YOUR_SUPABASE_URL',key:'YOUR_SUPABASE_ANON_KEY',monthly:'https://YOURSTORE.lemonsqueezy.com/checkout/buy/MONTHLY_ID',yearly:'https://YOURSTORE.lemonsqueezy.com/checkout/buy/YEARLY_ID'};
+let sb=null,plan='free',sess=null;
+try{if(window.supabase&&!CFG.url.startsWith('YOUR_'))sb=supabase.createClient(CFG.url,CFG.key)}catch(e){}
+const PRO='Domain / IP vulnerability report\nSEO keyword checker\nWeb scraper\nBug finder';
+async function refreshAcct(){const m=$('amsg');
+if(!sb){m.textContent='Accounts are not set up yet. Add your Supabase keys in CFG (see SETUP.md).';$('pmsg').textContent='Pro tools:\n'+PRO;return}
+try{sess=(await sb.auth.getSession()).data.session;plan='free';
+if(sess){const {data}=await sb.from('profiles').select('plan,pro_until').single();if(data&&data.plan==='pro'&&(!data.pro_until||new Date(data.pro_until)>new Date()))plan='pro'}}catch(e){m.textContent='Could not reach the account server.';return}
+$('aform').style.display=sess?'none':'block';$('aon').style.display=sess?'block':'none';
+m.textContent=sess?'Signed in as '+sess.user.email+'\nPlan: '+(plan==='pro'?'Pro (ad-free)':'Free'):'Not signed in.';
+document.querySelectorAll('.ad').forEach(a=>a.style.display=plan==='pro'?'none':'');
+$('pmsg').textContent=plan==='pro'?'Pro unlocked. These tools are being added next:\n'+PRO:'Pro only. Upgrade in the Account tab.\n\n'+PRO}
+async function auth(kind){const m=$('amsg');if(!sb){refreshAcct();return}const email=$('ae').value.trim(),password=$('ap').value;
+if(!email){m.textContent='Enter your email.';return}
+try{let r;
+if(kind==='in')r=await sb.auth.signInWithPassword({email,password});
+else if(kind==='up'){if(password.length<10){m.textContent='Use a password with 10+ characters.';return}r=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin}});if(!r.error){m.textContent='Check your email and confirm your account, then log in.';return}}
+else{r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin});if(!r.error){m.textContent='Password reset email sent.';return}}
+if(r.error)m.textContent=r.error.message;else{$('ap').value='';refreshAcct()}}catch(e){m.textContent='Could not reach the account server.'}}
+$('ain').onclick=()=>auth('in');$('aup').onclick=()=>auth('up');$('arst').onclick=()=>auth('rst');
+$('arf').onclick=refreshAcct;$('aout').onclick=async()=>{await sb.auth.signOut();refreshAcct()};
+function buy(u){if(!sb){refreshAcct();return}if(!sess){$('amsg').textContent='Log in first, then choose a plan.';return}window.open(u+'?checkout[email]='+encodeURIComponent(sess.user.email)+'&checkout[custom][user_id]='+sess.user.id,'_blank')}
+$('bm').onclick=()=>buy(CFG.monthly);$('by').onclick=()=>buy(CFG.yearly);
+if(sb)sb.auth.onAuthStateChange(()=>refreshAcct());
+refreshAcct();
+</script></body></html>
